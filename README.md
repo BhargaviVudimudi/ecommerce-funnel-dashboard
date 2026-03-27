@@ -6,6 +6,18 @@ This project analyzes user behavior across an e-commerce funnel to identify drop
 
 ---
 
+## Dashboard Comparison
+
+### Before
+
+![Before Dashboard](assets/before_dashboard.png)
+
+### After
+
+![After Dashboard](assets/after_dashboard.png)
+
+---
+
 ## Problem
 
 In e-commerce platforms, users often drop off before completing a purchase. It is important to identify:
@@ -112,7 +124,7 @@ IF(
 
 ## Project Files
 
-* Ecommerce_Dashboard.pbix → Power BI dashboard file
+* Ecommerce_Funnel_Dashboard.pbix → Power BI dashboard file
 
 ---
 
