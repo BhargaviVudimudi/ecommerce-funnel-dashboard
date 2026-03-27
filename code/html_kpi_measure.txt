@@ -1,0 +1,59 @@
+HTML KPI Card = 
+VAR _totalUsers = [Total Users]
+VAR _convRate = [Conversion Rate]
+VAR _totalRev = [Total Revenue]
+VAR _totalPurch = [Total Purchases]
+VAR _visitU = CALCULATE(DISTINCTCOUNT(EcommerceData[UserID]), EcommerceData[Stage] = "Visit", ALL(EcommerceData[Stage], EcommerceData[StageOrder]))
+VAR _pvU = CALCULATE(DISTINCTCOUNT(EcommerceData[UserID]), EcommerceData[Stage] = "Product View", ALL(EcommerceData[Stage], EcommerceData[StageOrder]))
+VAR _atcU = CALCULATE(DISTINCTCOUNT(EcommerceData[UserID]), EcommerceData[Stage] = "Add to Cart", ALL(EcommerceData[Stage], EcommerceData[StageOrder]))
+VAR _purchU = CALCULATE(DISTINCTCOUNT(EcommerceData[UserID]), EcommerceData[Stage] = "Purchase", ALL(EcommerceData[Stage], EcommerceData[StageOrder]))
+VAR _drop1 = IF(_visitU = 0, 0, 1 - DIVIDE(_pvU, _visitU))
+VAR _drop2 = IF(_pvU = 0, 0, 1 - DIVIDE(_atcU, _pvU))
+VAR _drop3 = IF(_atcU = 0, 0, 1 - DIVIDE(_purchU, _atcU))
+VAR _maxDrop = MAX(_drop1, MAX(_drop2, _drop3))
+VAR _maxDropStage = SWITCH(TRUE(), _maxDrop = _drop2 && _drop2 >= _drop1 && _drop2 >= _drop3, "Product View " & UNICHAR(8594) & " Add to Cart", _maxDrop = _drop3 && _drop3 >= _drop1 && _drop3 >= _drop2, "Add to Cart " & UNICHAR(8594) & " Purchase", "Visit " & UNICHAR(8594) & " Product View")
+VAR _revFmt = IF(_totalRev >= 1000000, FORMAT(_totalRev / 1000000, "#,0.0") & "M", IF(_totalRev >= 1000, FORMAT(_totalRev / 1000, "#,0.0") & "K", FORMAT(_totalRev, "#,0")))
+VAR _convFmt = FORMAT(_convRate * 100, "0.00") & "%"
+VAR _d1Fmt = FORMAT(_drop1 * 100, "0.0") & "%"
+VAR _d2Fmt = FORMAT(_drop2 * 100, "0.0") & "%"
+VAR _d3Fmt = FORMAT(_drop3 * 100, "0.0") & "%"
+VAR _maxDFmt = FORMAT(_maxDrop * 100, "0.0") & "%"
+VAR _pvBar = IF(_visitU = 0, 0, ROUND(DIVIDE(_pvU, _visitU) * 100, 0))
+VAR _atcBar = IF(_visitU = 0, 0, ROUND(DIVIDE(_atcU, _visitU) * 100, 0))
+VAR _purBar = IF(_visitU = 0, 0, ROUND(DIVIDE(_purchU, _visitU) * 100, 0))
+VAR _b1bg = IF(_drop1 >= 0.30, "#fef2f2", IF(_drop1 >= 0.15, "#fffbeb", "#f0fdf4"))
+VAR _b1cl = IF(_drop1 >= 0.30, "#dc2626", IF(_drop1 >= 0.15, "#d97706", "#16a34a"))
+VAR _b1bd = IF(_drop1 >= 0.30, "#fca5a5", IF(_drop1 >= 0.15, "#fcd34d", "#86efac"))
+VAR _b2bg = IF(_drop2 >= 0.30, "#fef2f2", IF(_drop2 >= 0.15, "#fffbeb", "#f0fdf4"))
+VAR _b2cl = IF(_drop2 >= 0.30, "#dc2626", IF(_drop2 >= 0.15, "#d97706", "#16a34a"))
+VAR _b2bd = IF(_drop2 >= 0.30, "#fca5a5", IF(_drop2 >= 0.15, "#fcd34d", "#86efac"))
+VAR _b3bg = IF(_drop3 >= 0.30, "#fef2f2", IF(_drop3 >= 0.15, "#fffbeb", "#f0fdf4"))
+VAR _b3cl = IF(_drop3 >= 0.30, "#dc2626", IF(_drop3 >= 0.15, "#d97706", "#16a34a"))
+VAR _b3bd = IF(_drop3 >= 0.30, "#fca5a5", IF(_drop3 >= 0.15, "#fcd34d", "#86efac"))
+VAR _css = "<style>@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes growBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}@keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(239,68,68,0.12)}50%{box-shadow:0 0 22px rgba(239,68,68,0.32)}}@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}*{margin:0;padding:0;box-sizing:border-box}"
+VAR _css2 = ".root{font-family:Segoe UI,sans-serif;padding:24px 28px;border-radius:16px;background:linear-gradient(160deg,#f8faff,#eef1f8);animation:fadeUp .6s ease-out both;max-width:720px;margin:0 auto}"
+VAR _css3 = ".hdr{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #e2e8f0}.hdr-dot{width:8px;height:8px;border-radius:50%;background:#0094d9}.hdr-txt{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1.5px}"
+VAR _css4 = ".cards{display:flex;gap:14px;margin-bottom:22px}.card{flex:1;background:#fff;border-radius:12px;padding:18px 16px;text-align:center;border:1px solid #e8ecf1;box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:transform .3s ease,box-shadow .3s ease;animation:fadeUp .5s ease-out both;position:relative;overflow:hidden}"
+VAR _css5 = ".card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 8px 28px rgba(0,0,0,0.1)}.c-lbl{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}.c-val{font-size:28px;font-weight:800;line-height:1}.c-blue{color:#0094d9}.c-green{color:#39b54a}.c-orange{color:#f7931f}.c-sub{font-size:10px;color:#94a3b8;margin-top:4px;font-weight:500}"
+VAR _css6 = ".sec{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1.2px;margin:20px 0 14px 0}.frow{display:flex;align-items:center;margin-bottom:10px;animation:fadeUp .5s ease-out both}.f-lbl{width:96px;flex-shrink:0;font-size:11.5px;font-weight:600;color:#334155}"
+VAR _css7 = ".f-barbg{flex:1;height:28px;background:#f1f5f9;border-radius:8px;overflow:hidden;margin:0 10px}.f-bar{height:100%;border-radius:8px;background:linear-gradient(90deg,#0094d9,#38bdf8);transform-origin:left;animation:growBar .9s ease both;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:28px}.f-bar-num{font-size:11px;font-weight:700;color:#fff}"
+VAR _css8 = ".f-ct{width:36px;text-align:right;flex-shrink:0;font-size:14px;font-weight:800;color:#1e293b}.f-drop{width:62px;flex-shrink:0;display:flex;justify-content:flex-end}.dbadge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid;white-space:nowrap}"
+VAR _css9 = ".alert{background:linear-gradient(135deg,#fef2f2,#ffe4e6);border:1.5px solid #fca5a5;border-radius:12px;padding:16px 18px;margin-top:18px;display:flex;align-items:center;gap:14px;animation:fadeUp .6s ease-out .72s both,pulse 2.8s ease-in-out infinite;transition:transform .3s ease,box-shadow .3s ease}.alert:hover{transform:scale(1.012);box-shadow:0 6px 20px rgba(239,68,68,0.15)}"
+VAR _css10 = ".a-icon{font-size:32px;flex-shrink:0}.a-ttl{font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}.a-stage{font-size:15px;font-weight:800;color:#dc2626}.a-pct{font-size:24px;font-weight:900;margin-left:auto;flex-shrink:0;background:linear-gradient(90deg,#ef4444,#f87171,#ef4444);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2.5s linear infinite}"
+VAR _css11 = ".foot{margin-top:14px;padding-top:10px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#94a3b8;font-weight:500}.foot-dots{display:flex;gap:4px}.foot-dot{width:5px;height:5px;border-radius:50%;opacity:.5}</style>"
+VAR _topbar1 = "<div style='position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;background:linear-gradient(90deg,#0094d9,#00b8f5)'></div>"
+VAR _topbar2 = "<div style='position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;background:linear-gradient(90deg,#39b54a,#5cd66e)'></div>"
+VAR _topbar3 = "<div style='position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;background:linear-gradient(90deg,#f7931f,#ffb347)'></div>"
+VAR _hdr = "<div class='root'>"
+VAR _card1 = "<div class='cards'><div class='card'>" & _topbar1 & "<div class='c-lbl'>Total Users</div><div class='c-val c-blue'>" & FORMAT(_totalUsers, "#,0") & "</div><div class='c-sub'>All visitors</div></div>"
+VAR _card2 = "<div class='card'>" & _topbar2 & "<div class='c-lbl'>Conversion Rate</div><div class='c-val c-green'>" & _convFmt & "</div><div class='c-sub'>Visit to Purchase</div></div>"
+VAR _card3 = "<div class='card'>" & _topbar3 & "<div class='c-lbl'>Total Revenue</div><div class='c-val c-orange'>" & UNICHAR(8377) & " " & _revFmt & "</div><div class='c-sub'>" & FORMAT(_totalPurch, "#,0") & " purchases</div></div></div>"
+VAR _secTitle = "<div class='sec'>Funnel Breakdown</div>"
+VAR _row1 = "<div class='frow'><div class='f-lbl'>Visit</div><div class='f-barbg'><div class='f-bar' style='width:100%'><span class='f-bar-num'>100%</span></div></div><div class='f-ct'>" & FORMAT(_visitU, "#,0") & "</div><div class='f-drop'></div></div>"
+VAR _row2 = "<div class='frow'><div class='f-lbl'>Product View</div><div class='f-barbg'><div class='f-bar' style='width:" & _pvBar & "%'><span class='f-bar-num'>" & _pvBar & "%</span></div></div><div class='f-ct'>" & FORMAT(_pvU, "#,0") & "</div><div class='f-drop'><span class='dbadge' style='background:" & _b1bg & ";color:" & _b1cl & ";border-color:" & _b1bd & "'>" & UNICHAR(8595) & " " & _d1Fmt & "</span></div></div>"
+VAR _row3 = "<div class='frow'><div class='f-lbl'>Add to Cart</div><div class='f-barbg'><div class='f-bar' style='width:" & _atcBar & "%'><span class='f-bar-num'>" & _atcBar & "%</span></div></div><div class='f-ct'>" & FORMAT(_atcU, "#,0") & "</div><div class='f-drop'><span class='dbadge' style='background:" & _b2bg & ";color:" & _b2cl & ";border-color:" & _b2bd & "'>" & UNICHAR(8595) & " " & _d2Fmt & "</span></div></div>"
+VAR _row4 = "<div class='frow'><div class='f-lbl'>Purchase</div><div class='f-barbg'><div class='f-bar' style='width:" & _purBar & "%'><span class='f-bar-num'>" & _purBar & "%</span></div></div><div class='f-ct'>" & FORMAT(_purchU, "#,0") & "</div><div class='f-drop'><span class='dbadge' style='background:" & _b3bg & ";color:" & _b3cl & ";border-color:" & _b3bd & "'>" & UNICHAR(8595) & " " & _d3Fmt & "</span></div></div>"
+VAR _alertBox = "<div class='alert'><div class='a-icon'>&#9888;</div><div><div class='a-ttl'>Highest Drop-off Stage</div><div class='a-stage'>" & _maxDropStage & "</div></div><div class='a-pct'>" & _maxDFmt & "</div></div>"
+VAR _footer = "</div>"
+VAR _html = _css & _css2 & _css3 & _css4 & _css5 & _css6 & _css7 & _css8 & _css9 & _css10 & _css11 & _hdr & _card1 & _card2 & _card3 & _secTitle & _row1 & _row2 & _row3 & _row4 & _alertBox & _footer
+RETURN _html
