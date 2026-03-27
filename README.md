@@ -1,92 +1,128 @@
-# 🛒 E-commerce Conversion Funnel Dashboard
+# E-commerce Conversion Funnel Dashboard
 
-![Dashboard Preview](assets/after_dashboard.png)
+## Overview
 
----
-
-## 🚀 Overview
-
-This project analyzes user behavior across an e-commerce funnel to identify **where users drop off** and how to improve conversions.
+This project analyzes user behavior across an e-commerce funnel to identify drop-off points and improve conversion rates. The dashboard is designed with a focus on both data analysis and product thinking.
 
 ---
 
-## 🎯 Problem
+## Problem
 
-E-commerce platforms often struggle to understand:
+In e-commerce platforms, users often drop off before completing a purchase. It is important to identify:
 
-* Where users leave before purchasing
-* Which stage impacts conversion most
+* Where users are leaving the funnel
+* Which stage impacts conversion the most
 * How user behavior affects revenue
 
 ---
 
-## 📊 Solution
+## Objective
 
-Built a **Power BI dashboard** with:
+To build a dashboard that highlights conversion bottlenecks and supports data-driven decision making.
 
-* Funnel analysis (Visit → Purchase)
-* Drop-off % at each stage
+---
+
+## Dashboard Features
+
+* Funnel analysis from Visit to Purchase
+* Stage-wise drop-off percentage
 * Conversion rate tracking
-* Revenue insights
-* Segmentation (Source, Device, Category)
+* Revenue analysis by product category
+* Segmentation by Source and Device
+* Interactive slicers for dynamic filtering
 
 ---
 
-## ✨ Key Features
+## Key Insights
 
-* 📉 Funnel visualization with stage-wise drop-off
-* 🔴 Highlight of highest drop-off stage
-* 🎨 Animated KPI cards using HTML + CSS
-* ⚡ Interactive slicers for dynamic analysis
-
----
-
-## 🔍 Key Insights
-
-* 🔴 Highest drop (~33%) at **Product View → Add to Cart**
-* 📱 Mobile users show lower engagement
-* 💰 Electronics drives highest revenue
-* 📉 Mid-funnel friction impacts conversion
+* Highest drop-off of around 33% occurs between Product View and Add to Cart
+* Mid-funnel stages contribute most to conversion loss
+* Electronics category generates the highest revenue
+* User behavior varies across sources and devices
 
 ---
 
-## 💡 Recommendations
+## Business Recommendations
 
-* Improve Add-to-Cart UX (CTA visibility, trust signals)
-* Optimize product page experience
-* Focus on mobile usability
-* Retarget mid-funnel drop-off users
-
----
-
-## 🖼️ Before vs After
-
-### Before
-
-![Before](assets/before_dashboard.png)
-
-### After
-
-![After](assets/after_dashboard.png)
+* Improve Add-to-Cart experience and CTA visibility
+* Optimize product page design and trust elements
+* Enhance mobile user experience
+* Retarget users dropping off in mid-funnel
 
 ---
 
-## 🛠️ Tech Stack
+## Important DAX Measures
+
+### Total Users
+
+```DAX
+Total Users = DISTINCTCOUNT(EcommerceData[UserID])
+```
+
+### Total Revenue
+
+```DAX
+Total Revenue = SUM(EcommerceData[Revenue])
+```
+
+### Total Purchases
+
+```DAX
+Total Purchases =
+CALCULATE(
+    DISTINCTCOUNT(EcommerceData[UserID]),
+    EcommerceData[Stage] = "Purchase"
+)
+```
+
+### Conversion Rate
+
+```DAX
+Conversion Rate =
+DIVIDE([Total Purchases], [Total Users], 0)
+```
+
+### Drop Off %
+
+```DAX
+Drop Off % =
+VAR CurrentStage = SELECTEDVALUE(EcommerceData[StageOrder])
+
+VAR CurrentUsers =
+    CALCULATE(
+        DISTINCTCOUNT(EcommerceData[UserID]),
+        FILTER(ALL(EcommerceData), EcommerceData[StageOrder] = CurrentStage)
+    )
+
+VAR NextUsers =
+    CALCULATE(
+        DISTINCTCOUNT(EcommerceData[UserID]),
+        FILTER(ALL(EcommerceData), EcommerceData[StageOrder] = CurrentStage + 1)
+    )
+
+RETURN
+IF(
+    ISBLANK(CurrentStage) || ISBLANK(NextUsers),
+    BLANK(),
+    1 - DIVIDE(NextUsers, CurrentUsers)
+)
+```
+
+---
+
+## Project Files
+
+* Ecommerce_Dashboard.pbix → Power BI dashboard file
+
+---
+
+## Tools Used
 
 * Power BI
 * DAX
-* HTML + CSS (inside Power BI visual)
 
 ---
 
-## 📂 Project Files
+## Outcome
 
-* `.pbix` → Dashboard file
-* `html_kpi_measure.txt` → Animated KPI logic
-* `case_study.pdf` → Project explanation
-
----
-
-## 🚀 Outcome
-
-Transformed a basic dashboard into a **product-style analytics solution** that highlights critical business insights and supports decision-making.
+Developed a structured dashboard that identifies conversion issues and supports business decisions with clear, actionable insights.
